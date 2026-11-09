@@ -3,7 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import RegisterPage from "../../features/auth/pages/RegisterPage";
 import VerifyEmailPage from "../../features/auth/pages/VerifyEmailPage";
 import LoginPage from "../../features/auth/pages/LoginPage";
-import HomePage from "../../features/auth/pages/HomePage";
+import HomePage from "../../features/home/pages/HomePage";
 
 import ProtectedRoute from "./ProtectedRoute";
 import RoleBasedRoute from "./RoleBasedRoute";
@@ -12,6 +12,8 @@ import ForgotPasswordPage from "../../features/auth/pages/ForgotPasswordPage";
 import VerifyResetOtpPage from "../../features/auth/pages/VerifyResetOtpPage";
 import ResetPasswordPage from "../../features/auth/pages/ResetPasswordPage";
 import ChangePasswordPage from "../../features/auth/pages/ChangePasswordPage";
+
+import SearchResultsPage from "../../features/home/pages/SearchResultsPage";
 
 export const router = createBrowserRouter([
   // Public routes
@@ -43,6 +45,11 @@ export const router = createBrowserRouter([
           {
             path: "/",
             element: <HomePage />,
+          },
+
+          {
+            path: "/search",
+            element: <SearchResultsPage />,
           },
         ],
       },
