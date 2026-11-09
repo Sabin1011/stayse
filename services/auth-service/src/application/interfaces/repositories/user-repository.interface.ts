@@ -1,21 +1,18 @@
-export interface CreateUserData{
-    fullName: string;
-    email: string;
-    passwordHash: string;
+import type { User, UserStatus } from "../../../domain/entities/user.entity.js";
+
+export interface CreateUserData {
+  fullName: string;
+  email: string;
+  passwordHash: string;
+  status: UserStatus;
 }
 
-export interface UserRecord{
-    id: string;
-    fullName: string;
-    email: string;
-    passwordHash: string;
-    status: "active" | "suspended" | "pending";
-    createdAt: Date;
-    updatedAt: Date;
-}
+export interface UserRepository {
+  findByEmail(email: string): Promise<User | null>;
 
-export interface UserRepository{
-    findByEmail(email:string): Promise<UserRecord | null>;
-    findById(id: string): Promise<UserRecord | null>;
-    create(data: CreateUserData): Promise<UserRecord>;
+  findById(id: string): Promise<User | null>;
+  findRolesByUserId(userId: string): Promise<string[]>;
+
+  registerWithDefaultRole(data: CreateUserData): Promise<User>;
+  update(user: User): Promise<User>;
 }

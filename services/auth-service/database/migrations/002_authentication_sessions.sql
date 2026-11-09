@@ -1,7 +1,4 @@
 
--- Stayse Auth Service
--- Migration: 002_authentication_sessions.sql
-
 -- 1. Verification challenges
 CREATE TABLE verification_challenges (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
