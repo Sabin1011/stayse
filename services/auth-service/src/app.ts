@@ -18,6 +18,7 @@ import {
   resetPasswordController,
   changePassword,
   googleSignIn,
+  updateUserProfile,
 } from "./infrastructure/di/container.js";
 
 import { createAuthRoutes } from "./presentation/http/routes/auth.routes.js";
@@ -54,6 +55,7 @@ app.use(
     resetPasswordController,
     changePassword,
     googleSignIn,
+    updateUserProfile,
   ),
 );
 

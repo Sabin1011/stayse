@@ -49,6 +49,9 @@ import { GoogleSignIn } from "../../application/use-cases/google-sign-in.use-cas
 import { PostgresExternalIdentityRepository } from "../database/postgres/repositories/postgres-external-identity.repository.js";
 import { GoogleSignInController } from "../../presentation/http/controllers/google-sign-in.controller.js";
 
+import { GetCurrentUserUseCase } from "../../application/use-cases/get-current-user.use-case.js";
+import { UpdateUserProfileUseCase } from "../../application/use-cases/update-user-profile.use-case.js";
+
 const userRepository = new PostgresUserRepository(postgresPool);
 
 const passwordResetGrantRepository =
@@ -112,9 +115,12 @@ export const authenticateMiddleware = new AuthenticateMiddleware(
 
 export const authorizeRolesMiddleware = new AuthorizeRolesMiddleware(userRepository);
 
+export const getCurrentUserUseCase = new GetCurrentUserUseCase(
+  userRepository,
+)
 
 export const getCurrentUserController = new GetCurrentUserController(
-  userRepository,
+  getCurrentUserUseCase,
 );
 
 
@@ -206,4 +212,8 @@ export const googleSignIn = new GoogleSignIn(
 
 export const googleSignInController = new GoogleSignInController(
   googleSignIn,
+);
+
+export const updateUserProfile = new UpdateUserProfileUseCase(
+  userRepository,
 );

@@ -33,6 +33,12 @@ import { ChangePasswordController } from "../controllers/change-password.control
 import type { GoogleSignIn } from "../../../application/use-cases/google-sign-in.use-case.js";
 import { GoogleSignInController } from "../controllers/google-sign-in.controller.js";
 
+import type { UpdateUserProfileUseCase } from "../../../application/use-cases/update-user-profile.use-case.js";
+import { UpdateUserProfileController } from "../controllers/update-user-profile.controller.js";
+import { updateUserProfileSchema } from "../validators/update-user-profile.validator.js";
+import { validateRequest } from "../middlewares/validate-request.middleware.js";
+
+
 
 export function createAuthRoutes(
   registerUser: RegisterUser,
@@ -50,6 +56,7 @@ export function createAuthRoutes(
   resetPasswordController: ResetPasswordController,
   changePassword: ChangePassword,
   googleSignIn: GoogleSignIn,
+  updateUserProfile: UpdateUserProfileUseCase,
 ): Router {
   const router = Router();
 
@@ -61,6 +68,7 @@ export function createAuthRoutes(
   const logoutController = new LogoutController(logoutUser);
   const changePasswordController = new ChangePasswordController(changePassword);
   const googleSignInController = new GoogleSignInController(googleSignIn);
+  const updateUserProfileController = new UpdateUserProfileController(updateUserProfile,);
 
 
 
@@ -93,10 +101,11 @@ export function createAuthRoutes(
   router.post("/logout", logoutController.handle);
 
   router.get("/me", authenticateMiddleware.handle, getCurrentUserController.handle,);
+  router.patch("/profile",authenticateMiddleware.handle, validateRequest(updateUserProfileSchema),updateUserProfileController.handle,);
 
   router.post("/google", googleSignInController.handle);
 
   return router;
 
-
+  
 }

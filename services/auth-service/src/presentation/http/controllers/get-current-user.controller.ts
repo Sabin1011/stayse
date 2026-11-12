@@ -1,8 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
-import type { UserRepository } from "../../../application/interfaces/repositories/user-repository.interface.js";
+import type { GetCurrentUserUseCase } from "../../../application/use-cases/get-current-user.use-case.js";
 
 export class GetCurrentUserController {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
+  ) {}
 
   handle = async (
     req: Request,
@@ -15,31 +17,13 @@ export class GetCurrentUserController {
         email: string;
       };
 
-      const user = await this.userRepository.findById(
+      const user = await this.getCurrentUserUseCase.execute(
         authenticatedUser.userId,
       );
-      const roles = await this.userRepository.findRolesByUserId(
-        authenticatedUser.userId,
-      );
-
-      if (!user) {
-        res.status(404).json({
-          message: "User not found",
-        });
-        return;
-      }
 
       res.status(200).json({
         message: "User retrieved successfully",
-        user: {
-          id: user.id,
-          fullName: user.fullName,
-          email: user.email.getValue(),
-          status: user.status,
-          emailVerified: user.isEmailVerified,
-          roles,
-          createdAt: user.createdAt,
-        },
+        user,
       });
     } catch (error) {
       next(error);
