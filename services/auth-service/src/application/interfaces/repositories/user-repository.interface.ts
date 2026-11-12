@@ -15,4 +15,11 @@ export interface UserRepository {
 
   registerWithDefaultRole(data: CreateUserData): Promise<User>;
   update(user: User): Promise<User>;
+
+  registerGoogleUser(data: CreateGoogleUserData): Promise<User>;
+}
+
+export interface CreateGoogleUserData {
+  fullName: string;
+  email: string;
 }

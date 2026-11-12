@@ -27,6 +27,29 @@ services:
       retries: 5
       start_period: 10s
 
+  mongodb:
+    image: mongo:8.2
+    container_name: stayse-mongodb
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:27017:27017"
+
+    volumes:
+      - stayse_mongodb_data:/data/db
+
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - "db.adminCommand('ping').ok"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   auth-service:
     build:
       context: .
@@ -34,6 +57,7 @@ services:
     container_name: stayse-auth-service
     restart: unless-stopped
     environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       NODE_ENV: production
       PORT: 3000
       DB_HOST: postgres
@@ -53,7 +77,26 @@ services:
       postgres:
         condition: service_healthy
 
-  
+
+  properties-service:
+    build:
+      context: .
+      dockerfile: services/properties-service/Dockerfile
+    container_name: stayse-properties-service
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3001
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI in .env}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?Set JWT_ACCESS_SECRET in .env}
+
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
   nginx:
     image: nginx:alpine
     container_name: stayse-nginx
@@ -67,8 +110,11 @@ services:
 
     depends_on:
       - auth-service
+      - properties-service
 
 volumes:
   stayse_postgres_data:
     external: true
     name: stayse_staywise_postgres_data
+  stayse_mongodb_data:
+    name: stayse_mongodb_data

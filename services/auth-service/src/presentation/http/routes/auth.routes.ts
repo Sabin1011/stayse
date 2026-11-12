@@ -30,6 +30,10 @@ import type { ResetPasswordController } from "../controllers/reset-password.cont
 import type { ChangePassword } from "../../../application/use-cases/change-password.use-case.js";
 import { ChangePasswordController } from "../controllers/change-password.controller.js";
 
+import type { GoogleSignIn } from "../../../application/use-cases/google-sign-in.use-case.js";
+import { GoogleSignInController } from "../controllers/google-sign-in.controller.js";
+
+
 export function createAuthRoutes(
   registerUser: RegisterUser,
   emailSender: EmailSender,
@@ -45,6 +49,7 @@ export function createAuthRoutes(
   verifyPasswordResetOtpController: VerifyPasswordResetOtpController,
   resetPasswordController: ResetPasswordController,
   changePassword: ChangePassword,
+  googleSignIn: GoogleSignIn,
 ): Router {
   const router = Router();
 
@@ -55,7 +60,7 @@ export function createAuthRoutes(
   const refreshTokenController = new RefreshTokenController(refreshAccessToken);
   const logoutController = new LogoutController(logoutUser);
   const changePasswordController = new ChangePasswordController(changePassword);
-  
+  const googleSignInController = new GoogleSignInController(googleSignIn);
 
 
 
@@ -86,8 +91,11 @@ export function createAuthRoutes(
   router.post("/login", loginUserController.handle);
   router.post("/refresh", refreshTokenController.handle);
   router.post("/logout", logoutController.handle);
-  
+
   router.get("/me", authenticateMiddleware.handle, getCurrentUserController.handle,);
+
+  router.post("/google", googleSignInController.handle);
+
   return router;
 
 

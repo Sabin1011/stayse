@@ -42,6 +42,13 @@ import { VerifyPasswordResetOtpController } from "../../presentation/http/contro
 import { ResetPasswordController } from "../../presentation/http/controllers/reset-password.controller.js";
 import { ChangePassword } from "../../application/use-cases/change-password.use-case.js";
 
+import { GoogleIdTokenVerifierImpl } from "../security/google-id-token-verifier.js";
+
+import { GoogleSignIn } from "../../application/use-cases/google-sign-in.use-case.js";
+
+import { PostgresExternalIdentityRepository } from "../database/postgres/repositories/postgres-external-identity.repository.js";
+import { GoogleSignInController } from "../../presentation/http/controllers/google-sign-in.controller.js";
+
 const userRepository = new PostgresUserRepository(postgresPool);
 
 const passwordResetGrantRepository =
@@ -94,6 +101,7 @@ export const resendEmailVerificationOtpController =
 
 const refreshSessionRepository = new PostgresRefreshSessionRepository(postgresPool);
 export const refreshTokenGenerator = new CryptoRefreshTokenGenerator();
+
 export const accessTokenGenerator = new JwtAccessTokenGenerator();
 export const accessTokenVerifier = new JwtAccessTokenVerifier();
 
@@ -180,3 +188,22 @@ export const resetPasswordController =
   new ResetPasswordController(
     resetPassword,
   );
+
+
+export const googleIdTokenVerifier = new GoogleIdTokenVerifierImpl();
+
+const externalIdentityRepository =
+  new PostgresExternalIdentityRepository(postgresPool);
+
+export const googleSignIn = new GoogleSignIn(
+  googleIdTokenVerifier,
+  userRepository,
+  externalIdentityRepository,
+  accessTokenGenerator,
+  refreshTokenGenerator,
+  refreshSessionRepository,
+);
+
+export const googleSignInController = new GoogleSignInController(
+  googleSignIn,
+);
