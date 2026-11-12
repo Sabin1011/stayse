@@ -1,5 +1,6 @@
+
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -10,6 +11,7 @@ import Button from "../../../components/ui/Button";
 import FormField from "../../../components/ui/FormField";
 import Input from "../../../components/ui/Input";
 import PasswordInput from "../components/PasswordInput";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
 import { useAppDispatch } from "../../../app/store/hooks";
 import { setAccessToken, setUser } from "../../../app/store/authSlice";
@@ -19,15 +21,23 @@ import {
   type LoginFormValues,
 } from "../validation/login.schema";
 
-import { loginUser, getCurrentUser } from "../../../services/api/authApi";
+import {
+  loginUser,
+  googleSignIn,
+  getCurrentUser,
+} from "../../../services/api/authApi";
+
+import { store } from "../../../app/store/store";
 
 function LoginPage() {
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    const location = useLocation();
-    const successMessage = location.state?.message as string | undefined;
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const location = useLocation();
+
+  const successMessage = location.state?.message as string | undefined;
 
   const [apiError, setApiError] = useState<string | null>(null);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const {
     register,
@@ -41,31 +51,41 @@ function LoginPage() {
     },
   });
 
+  const completeLogin = async (accessToken: string) => {
+    console.log("Received access token:", !!accessToken);
+
+    dispatch(setAccessToken(accessToken));
+
+    console.log(
+      "Redux access token:",
+      !!store.getState().auth.accessToken,
+    );
+
+    try {
+      const currentUserResponse = await getCurrentUser();
+      dispatch(setUser(currentUserResponse.user));
+      navigate("/");
+    } catch (error) {
+      dispatch(setAccessToken(""));
+      throw error;
+    }
+  };
+
   const onSubmit = async (data: LoginFormValues) => {
     setApiError(null);
 
     try {
-      // Step 1: Authenticate the user.
       const response = await loginUser({
         email: data.email,
         password: data.password,
       });
 
-      dispatch(setAccessToken(response.accessToken));
-
-      const currentUserResponse = await getCurrentUser();
-
-      dispatch(setUser(currentUserResponse.user));
-
-      console.log("Login successful");
-      navigate("/");
-      
+      await completeLogin(response.accessToken);
     } catch (error) {
       console.error("Login failed:", error);
 
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.error?.message;
-
         setApiError(
           typeof message === "string"
             ? message
@@ -77,15 +97,49 @@ function LoginPage() {
     }
   };
 
+  const handleGoogleSuccess = useCallback(async (idToken: string) => {
+    setApiError(null);
+    setIsGoogleLoading(true);
+
+    try {
+      const response = await googleSignIn({ idToken });
+      await completeLogin(response.data.accessToken);
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+
+      if (axios.isAxiosError(error)) {
+        const message =
+          error.response?.data?.message ||
+          error.response?.data?.error?.message;
+
+        setApiError(
+          typeof message === "string"
+            ? message
+            : "Google sign-in failed. Please try again.",
+        );
+      } else {
+        setApiError("Google sign-in failed. Please try again.");
+      }
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  }, []);
+
+  const handleGoogleError = useCallback((message: string) => {
+    setApiError(message);
+  }, []);
+
   return (
     <AuthLayout
       title="Welcome back"
       description="Sign in to continue your Stayse journey."
     >
       <Card className="space-y-5">
-
         {successMessage && (
-          <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700" role="status">
+          <p
+            className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700"
+            role="status"
+          >
             {successMessage}
           </p>
         )}
@@ -143,11 +197,31 @@ function LoginPage() {
             type="submit"
             fullWidth
             isLoading={isSubmitting}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isGoogleLoading}
           >
             Sign in
           </Button>
         </form>
+
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-sm text-text-secondary">OR</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <div className={isGoogleLoading ? "pointer-events-none opacity-60" : ""}>
+          <GoogleSignInButton
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            disabled={isGoogleLoading || isSubmitting}
+          />
+        </div>
+
+        {isGoogleLoading && (
+          <p className="text-center text-sm text-text-secondary">
+            Signing in with Google...
+          </p>
+        )}
 
         <p className="text-center text-sm text-text-secondary">
           Don't have an account?{" "}

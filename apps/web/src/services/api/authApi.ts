@@ -90,6 +90,29 @@ export const loginUser = async (
   return response.data;
 };
 
+export interface GoogleSignInRequest {
+  idToken: string;
+}
+
+export interface GoogleSignInResponse {
+  success: boolean;
+  message: string;
+  data: {
+    accessToken: string;
+  };
+}
+
+export const googleSignIn = async (
+  data: GoogleSignInRequest,
+): Promise<GoogleSignInResponse> => {
+  const response = await axiosInstance.post<GoogleSignInResponse>(
+    "/auth/google",
+    data,
+  );
+
+  return response.data;
+};
+
 
 export interface RefreshTokenResponse {
   message: string;

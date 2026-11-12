@@ -17,6 +17,7 @@ import {
   verifyPasswordResetOtpController,
   resetPasswordController,
   changePassword,
+  googleSignIn,
 } from "./infrastructure/di/container.js";
 
 import { createAuthRoutes } from "./presentation/http/routes/auth.routes.js";
@@ -52,6 +53,7 @@ app.use(
     verifyPasswordResetOtpController,
     resetPasswordController,
     changePassword,
+    googleSignIn,
   ),
 );
 

@@ -1,7 +1,9 @@
 
 import type { Pool, QueryResultRow } from "pg";
+import crypto from "node:crypto";
 
 import type {
+  CreateGoogleUserData,
   CreateUserData,
   UserRepository,
 } from "../../../../application/interfaces/repositories/user-repository.interface.js";
@@ -203,5 +205,69 @@ export class PostgresUserRepository implements UserRepository {
     }
 
     return this.toDomain(row);
+  }
+
+  async registerGoogleUser(data: CreateGoogleUserData): Promise<User> {
+    const client = await this.pool.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      const result = await client.query<UserRow>(
+        `
+          INSERT INTO users (
+            full_name,
+            email,
+            password_hash,
+            status,
+            email_verified_at
+          )
+          VALUES ($1, $2, $3, 'active', NOW())
+          RETURNING
+            id,
+            full_name AS "fullName",
+            email,
+            password_hash AS "passwordHash",
+            status,
+            email_verified_at AS "emailVerifiedAt",
+            created_at AS "createdAt",
+            updated_at AS "updatedAt"
+        `,
+        [
+          data.fullName,
+          data.email,
+          `google-oauth:${crypto.randomUUID()}`,
+        ],
+      );
+
+      const row = result.rows[0];
+
+      if (!row) {
+        throw new Error("Failed to create Google user");
+      }
+
+      const roleResult = await client.query(
+        `
+          INSERT INTO user_roles (user_id, role_id)
+          SELECT $1, id
+          FROM roles
+          WHERE name = $2
+        `,
+        [row.id, "guest"],
+      );
+
+      if (roleResult.rowCount !== 1) {
+        throw new Error("Failed to assign the default guest role");
+      }
+
+      await client.query("COMMIT");
+
+      return this.toDomain(row);
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 }

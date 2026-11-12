@@ -20,6 +20,8 @@ const envSchema = z.object({
   MAIL_USER: z.string().min(1),
   MAIL_PASSWORD: z.string().min(1),
   MAIL_FROM: z.string().min(1),
+
+  GOOGLE_CLIENT_ID: z.string().min(1),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
