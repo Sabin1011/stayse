@@ -19,6 +19,7 @@ import {
   changePassword,
   googleSignIn,
   updateUserProfile,
+  uploadProfileImage,
 } from "./infrastructure/di/container.js";
 
 import { createAuthRoutes } from "./presentation/http/routes/auth.routes.js";
@@ -56,6 +57,7 @@ app.use(
     changePassword,
     googleSignIn,
     updateUserProfile,
+    uploadProfileImage,
   ),
 );
 

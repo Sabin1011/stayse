@@ -17,6 +17,8 @@ export interface UserRepository {
   update(user: User): Promise<User>;
 
   registerGoogleUser(data: CreateGoogleUserData): Promise<User>;
+  
+  updateProfile(user: User): Promise<User>;
 }
 
 export interface CreateGoogleUserData {

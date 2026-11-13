@@ -11,6 +11,8 @@ export interface CreateUserProps {
   fullName: string;
   email: string;
   passwordHash: string;
+  profileImageUrl?: string | null;
+  profileImagePublicId?: string | null;
 }
 
 export interface UserProps {
@@ -20,6 +22,8 @@ export interface UserProps {
   passwordHash: string;
   status: UserStatus;
   emailVerifiedAt: Date | null;
+  profileImageUrl: string | null;
+  profileImagePublicId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +36,8 @@ export class User {
     private _passwordHash: string,
     private _status: UserStatus,
     private _emailVerifiedAt: Date | null,
+    private _profileImageUrl: string | null,
+    private _profileImagePublicId: string | null,
     private readonly _createdAt: Date,
     private _updatedAt: Date,
   ) {}
@@ -63,6 +69,8 @@ export class User {
       props.passwordHash,
       "pending_verification",
       null,
+      props.profileImageUrl ?? null,
+      props.profileImagePublicId ?? null,
       now,
       now,
     );
@@ -88,6 +96,8 @@ export class User {
       props.passwordHash,
       props.status,
       props.emailVerifiedAt,
+      props.profileImageUrl,
+      props.profileImagePublicId,
       props.createdAt,
       props.updatedAt,
     );
@@ -117,6 +127,14 @@ export class User {
     return this._emailVerifiedAt
       ? new Date(this._emailVerifiedAt)
       : null;
+  }
+
+  get profileImageUrl(): string | null {
+    return this._profileImageUrl;
+  }
+
+  get profileImagePublicId(): string | null {
+    return this._profileImagePublicId;
   }
 
   get createdAt(): Date {
@@ -186,6 +204,30 @@ export class User {
     }
 
     this._fullName = normalizedName;
+    this._updatedAt = new Date(at);
+  }
+
+  changeProfileImage(
+    imageUrl: string,
+    publicId: string,
+    at: Date = new Date(),
+  ): void {
+    if (!imageUrl.trim()) {
+      throw new DomainError(
+        "Profile image URL cannot be empty",
+        "INVALID_PROFILE_IMAGE_URL",
+      );
+    }
+
+    if (!publicId.trim()) {
+      throw new DomainError(
+        "Profile image public ID cannot be empty",
+        "INVALID_PROFILE_IMAGE_PUBLIC_ID",
+      );
+    }
+
+    this._profileImageUrl = imageUrl;
+    this._profileImagePublicId = publicId;
     this._updatedAt = new Date(at);
   }
 

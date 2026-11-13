@@ -52,6 +52,9 @@ import { GoogleSignInController } from "../../presentation/http/controllers/goog
 import { GetCurrentUserUseCase } from "../../application/use-cases/get-current-user.use-case.js";
 import { UpdateUserProfileUseCase } from "../../application/use-cases/update-user-profile.use-case.js";
 
+import { CloudinaryImageStorage } from "../cloudinary/cloudinary-image-storage.js";
+import { UploadProfileImageUseCase } from "../../application/use-cases/upload-profile-image.use-case.js";
+
 const userRepository = new PostgresUserRepository(postgresPool);
 
 const passwordResetGrantRepository =
@@ -216,4 +219,11 @@ export const googleSignInController = new GoogleSignInController(
 
 export const updateUserProfile = new UpdateUserProfileUseCase(
   userRepository,
+);
+
+export const imageStorage = new CloudinaryImageStorage();
+
+export const uploadProfileImage = new UploadProfileImageUseCase(
+  userRepository,
+  imageStorage,
 );

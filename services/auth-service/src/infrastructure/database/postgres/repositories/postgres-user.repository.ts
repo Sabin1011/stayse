@@ -20,6 +20,8 @@ interface UserRow extends QueryResultRow {
   passwordHash: string;
   status: UserStatus;
   emailVerifiedAt: Date | null;
+  profileImageUrl: string | null;
+  profileImagePublicId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,6 +37,8 @@ export class PostgresUserRepository implements UserRepository {
       passwordHash: row.passwordHash,
       status: row.status,
       emailVerifiedAt: row.emailVerifiedAt,
+      profileImageUrl: row.profileImageUrl,
+      profileImagePublicId: row.profileImagePublicId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     });
@@ -50,6 +54,8 @@ export class PostgresUserRepository implements UserRepository {
           password_hash AS "passwordHash",
           status,
           email_verified_at AS "emailVerifiedAt",
+          profile_image_url AS "profileImageUrl",
+          profile_image_public_id AS "profileImagePublicId",
           created_at AS "createdAt",
           updated_at AS "updatedAt"
         FROM users
@@ -74,6 +80,8 @@ export class PostgresUserRepository implements UserRepository {
           password_hash AS "passwordHash",
           status,
           email_verified_at AS "emailVerifiedAt",
+          profile_image_url AS "profileImageUrl",
+          profile_image_public_id AS "profileImagePublicId",
           created_at AS "createdAt",
           updated_at AS "updatedAt"
         FROM users
@@ -118,6 +126,8 @@ export class PostgresUserRepository implements UserRepository {
             password_hash AS "passwordHash",
             status,
             email_verified_at AS "emailVerifiedAt",
+            profile_image_url AS "profileImageUrl",
+            profile_image_public_id AS "profileImagePublicId",
             created_at AS "createdAt",
             updated_at AS "updatedAt"
         `,
@@ -185,6 +195,8 @@ export class PostgresUserRepository implements UserRepository {
           password_hash AS "passwordHash",
           status,
           email_verified_at AS "emailVerifiedAt",
+          profile_image_url AS "profileImageUrl",
+          profile_image_public_id AS "profileImagePublicId",
           created_at AS "createdAt",
           updated_at AS "updatedAt"
       `,
@@ -230,6 +242,8 @@ export class PostgresUserRepository implements UserRepository {
             password_hash AS "passwordHash",
             status,
             email_verified_at AS "emailVerifiedAt",
+            profile_image_url AS "profileImageUrl",
+            profile_image_public_id AS "profileImagePublicId",
             created_at AS "createdAt",
             updated_at AS "updatedAt"
         `,
@@ -269,5 +283,49 @@ export class PostgresUserRepository implements UserRepository {
     } finally {
       client.release();
     }
+  }
+
+  async updateProfile(user: User): Promise<User> {
+    if (!user.id) {
+      throw new Error("Cannot update a user without an ID");
+    }
+
+    const result = await this.pool.query<UserRow>(
+      `
+        UPDATE users
+        SET
+          full_name = $1,
+          profile_image_url = $2,
+          profile_image_public_id = $3,
+          updated_at = $4
+        WHERE id = $5
+        RETURNING
+          id,
+          full_name AS "fullName",
+          email,
+          password_hash AS "passwordHash",
+          status,
+          email_verified_at AS "emailVerifiedAt",
+          profile_image_url AS "profileImageUrl",
+          profile_image_public_id AS "profileImagePublicId",
+          created_at AS "createdAt",
+          updated_at AS "updatedAt"
+      `,
+      [
+        user.fullName,
+        user.profileImageUrl,
+        user.profileImagePublicId,
+        user.updatedAt,
+        user.id,
+      ],
+    );
+
+    const row = result.rows[0];
+
+    if (!row) {
+      throw new Error("User not found or profile update failed");
+    }
+
+    return this.toDomain(row);
   }
 }

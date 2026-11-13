@@ -38,6 +38,9 @@ import { UpdateUserProfileController } from "../controllers/update-user-profile.
 import { updateUserProfileSchema } from "../validators/update-user-profile.validator.js";
 import { validateRequest } from "../middlewares/validate-request.middleware.js";
 
+import { UploadProfileImageController } from "../controllers/upload-profile-image.controller.js";
+import { uploadImageMiddleware } from "../middlewares/upload-image.middleware.js";
+import type { UploadProfileImageUseCase } from "../../../application/use-cases/upload-profile-image.use-case.js";
 
 
 export function createAuthRoutes(
@@ -57,6 +60,7 @@ export function createAuthRoutes(
   changePassword: ChangePassword,
   googleSignIn: GoogleSignIn,
   updateUserProfile: UpdateUserProfileUseCase,
+  uploadProfileImage: UploadProfileImageUseCase,
 ): Router {
   const router = Router();
 
@@ -69,7 +73,7 @@ export function createAuthRoutes(
   const changePasswordController = new ChangePasswordController(changePassword);
   const googleSignInController = new GoogleSignInController(googleSignIn);
   const updateUserProfileController = new UpdateUserProfileController(updateUserProfile,);
-
+  const uploadProfileImageController =new UploadProfileImageController(uploadProfileImage);
 
 
   router.post("/register", registerUserController.handle);
@@ -104,8 +108,7 @@ export function createAuthRoutes(
   router.patch("/profile",authenticateMiddleware.handle, validateRequest(updateUserProfileSchema),updateUserProfileController.handle,);
 
   router.post("/google", googleSignInController.handle);
+  router.post("/profile/image",authenticateMiddleware.handle,uploadImageMiddleware.single("image"),uploadProfileImageController.handle,);
 
   return router;
-
-  
 }
