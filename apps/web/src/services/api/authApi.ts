@@ -150,6 +150,7 @@ export interface CurrentUserResponse {
     emailVerified: boolean;
     roles: string[];
     createdAt: string;
+    profileImageUrl: string | null;
   };
 }
 

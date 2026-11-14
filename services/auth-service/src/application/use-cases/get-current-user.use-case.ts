@@ -22,6 +22,7 @@ export class GetCurrentUserUseCase {
       emailVerified: user.isEmailVerified,
       roles,
       createdAt: user.createdAt,
+      profileImageUrl: user.profileImageUrl
     };
   }
 }

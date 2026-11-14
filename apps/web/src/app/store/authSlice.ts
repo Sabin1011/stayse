@@ -8,6 +8,7 @@ export interface AuthUser {
   emailVerified: boolean;
   roles: string[];
   createdAt: string;
+  profileImageUrl: string | null;
 }
 
 interface AuthState {

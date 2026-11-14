@@ -15,6 +15,9 @@ import ChangePasswordPage from "../../features/auth/pages/ChangePasswordPage";
 
 import SearchResultsPage from "../../features/home/pages/SearchResultsPage";
 
+import ProfilePage from "../../features/profile/pages/ProfilePage";
+import EditProfilePage from "../../features/profile/pages/EditProfilePage";
+
 export const router = createBrowserRouter([
   // Public routes
   {
@@ -34,6 +37,14 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
+      {
+        path: "/account/profile",
+        element: <ProfilePage />,
+      },
+      {
+        path: "/account/profile/edit",
+        element: <EditProfilePage />,
+      },
       {
         path: "/account/change-password",
         element: <ChangePasswordPage />,
