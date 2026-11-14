@@ -1,3 +1,4 @@
+
 import { HostApplication } from "../../domain/entities/host-application.entity.js";
 
 import {
@@ -8,9 +9,17 @@ import type {
   HostApplicationRepository,
 } from "../../domain/repositories/host-application.repository.js";
 
+import type {
+  HostApplicationDocumentRepository,
+} from "../../domain/repositories/host-application-document.repository.js";
+
 import {
   ActiveHostApplicationExistsError,
 } from "../../domain/errors/active-host-application-exists.error.js";
+
+import {
+  InvalidHostDocumentReferenceError,
+} from "../../domain/errors/invalid-host-document-reference.error.js";
 
 import type {
   SubmitHostApplicationDTO,
@@ -19,6 +28,7 @@ import type {
 export class SubmitHostApplicationUseCase {
   constructor(
     private readonly hostApplicationRepository: HostApplicationRepository,
+    private readonly hostDocumentRepository: HostApplicationDocumentRepository,
   ) {}
 
   async execute(
@@ -34,7 +44,49 @@ export class SubmitHostApplicationUseCase {
       throw new ActiveHostApplicationExistsError();
     }
 
-    // 2. Create a new domain entity.
+    // 2. Reject duplicate document references.
+    const references = dto.documentReferences.map(
+      (document) => document.protectedStorageRef,
+    );
+
+    if (new Set(references).size !== references.length) {
+      throw new InvalidHostDocumentReferenceError();
+    }
+
+    // 3. Verify that all documents belong to this applicant.
+    const ownedDocuments =
+      await this.hostDocumentRepository.findOwnedDocuments(
+        references,
+        dto.hostId,
+      );
+
+    if (ownedDocuments.length !== references.length) {
+      throw new InvalidHostDocumentReferenceError();
+    }
+
+    // 4. Verify that each submitted document type matches
+    // the type recorded when the file was uploaded.
+    const ownedDocumentsByReference = new Map(
+      ownedDocuments.map((document) => [
+        document.reference,
+        document,
+      ]),
+    );
+
+    for (const submittedDocument of dto.documentReferences) {
+      const storedDocument = ownedDocumentsByReference.get(
+        submittedDocument.protectedStorageRef,
+      );
+
+      if (
+        !storedDocument ||
+        storedDocument.documentType !== submittedDocument.documentType
+      ) {
+        throw new InvalidHostDocumentReferenceError();
+      }
+    }
+
+    // 5. Create a new domain entity.
     const now = new Date();
 
     const application = new HostApplication({
@@ -59,10 +111,10 @@ export class SubmitHostApplicationUseCase {
       updatedAt: now,
     });
 
-    // 3. Apply the domain submission rules.
+    // 6. Apply the domain submission rules.
     application.submit(dto.hostId);
 
-    // 4. Persist through the repository abstraction.
+    // 7. Persist through the application repository.
     return this.hostApplicationRepository.create(application);
   }
 }

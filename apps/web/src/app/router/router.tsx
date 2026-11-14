@@ -17,6 +17,8 @@ import SearchResultsPage from "../../features/home/pages/SearchResultsPage";
 
 import ProfilePage from "../../features/profile/pages/ProfilePage";
 import EditProfilePage from "../../features/profile/pages/EditProfilePage";
+import HostApplicationPage from "../../features/host-application/pages/HostApplicationPage";
+
 
 export const router = createBrowserRouter([
   // Public routes
@@ -37,6 +39,10 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
+      {
+        path: "/host-application",
+        element: <HostApplicationPage />,
+      },
       {
         path: "/account/profile",
         element: <ProfilePage />,

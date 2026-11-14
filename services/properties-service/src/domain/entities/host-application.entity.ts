@@ -106,6 +106,36 @@ export class HostApplication {
     }
   }
 
+
+  updateDetails(input: {
+    verificationType: VerificationType;
+    applicantDetails: ApplicantDetails;
+    businessDetails?: BusinessDetails;
+    documentReferences: HostDocumentReference[];
+  }): void {
+    if (
+      this.props.status !== HostApplicationStatus.DRAFT &&
+      this.props.status !== HostApplicationStatus.CHANGES_REQUESTED
+    ) {
+      throw new HostApplicationError(
+        "Only draft or changes-requested applications can be updated",
+      );
+    }
+
+    this.props.verificationType = input.verificationType;
+    this.props.applicantDetails = input.applicantDetails;
+    this.props.documentReferences = input.documentReferences;
+
+    if (input.businessDetails) {
+      this.props.businessDetails = input.businessDetails;
+    } else {
+      delete this.props.businessDetails;
+    }
+
+    this.props.updatedAt = new Date();
+  }
+
+
   submit(actorUserId: string): void {
     if (
       this.props.status !== HostApplicationStatus.DRAFT &&

@@ -1,9 +1,11 @@
-import { ArrowRight, Compass, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, Compass, ShieldCheck, Sparkles, BadgeCheck } from "lucide-react";
 import SiteNavbar from "../components/SiteNavbar";
 import SearchPanel from "../components/SearchPanel";
 import PropertyCard from "../components/PropertyCard";
 import SiteFooter from "../components/SiteFooter";
 import { destinations, properties } from "../data/mockProperties";
+
+import { Link } from "react-router-dom";
 
 const HERO = "https://images.unsplash.com/photo-1601918774946-25832a4be0d6?auto=format&fit=crop&w=2200&q=90";
 
@@ -54,6 +56,64 @@ export default function HomePage() {
             <div className="mt-7 flex shrink-0 items-center gap-3 rounded-2xl bg-white/80 px-5 py-4 text-sm font-bold text-slate-800 shadow-sm dark:bg-slate-900 dark:text-white lg:mt-0"><ShieldCheck size={25} className="text-accent" /><span>Designed around your journey</span></div>
           </div>
         </section>
+
+        
+        {/* Become a Host */}
+        <section
+          id="become-a-host"
+          className="mx-auto max-w-7xl px-5 pb-20 pt-20 sm:px-8 sm:pb-24"
+        >
+          <div className="relative overflow-hidden rounded-[28px] bg-slate-950 px-7 py-12 sm:px-12 sm:py-16 lg:px-16">
+            <div className="absolute -right-20 -top-24 h-80 w-80 rounded-full bg-blue-600/20 blur-3xl" />
+            <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl" />
+
+            <div className="relative flex flex-col justify-between gap-10 lg:flex-row lg:items-center">
+              <div className="max-w-2xl">
+                <Link
+                  to="/host-application"
+                  className="inline-flex items-center gap-3 rounded-xl bg-white px-7 py-4 text-sm font-bold text-slate-950 transition hover:bg-blue-50"
+                >
+                  Become a Host
+                  <ArrowRight size={18} />
+                </Link>
+
+                <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                  Turn your space into someone's next favourite stay.
+                </h2>
+
+                <p className="mt-5 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">
+                  Have a property worth sharing? Join Stayse as a host, showcase your
+                  space, and welcome travellers looking for memorable experiences.
+                </p>
+
+                <div className="mt-7 flex flex-wrap gap-5 text-sm text-slate-300">
+                  <span className="flex items-center gap-2">
+                    <BadgeCheck size={17} className="text-blue-400" />
+                    Verified host applications
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <ShieldCheck size={17} className="text-blue-400" />
+                    Secure platform
+                  </span>
+                </div>
+              </div>
+
+              <div className="shrink-0">
+                <a
+                  href="/host-application"
+                  className="inline-flex items-center gap-3 rounded-xl bg-white px-7 py-4 text-sm font-bold text-slate-950 transition hover:bg-blue-50"
+                >
+                  Become a Host
+                  <ArrowRight size={18} />
+                </a>
+                <p className="mt-3 text-center text-xs text-slate-400">
+                  Start your hosting journey with Stayse
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
       <SiteFooter />
     </div>
