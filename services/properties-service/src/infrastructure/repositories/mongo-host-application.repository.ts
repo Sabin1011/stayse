@@ -136,11 +136,11 @@ export class MongoHostApplicationRepository
     );
   }
 
-  // Find applications by status with pagination
-  async findByStatus(
-    status: HostApplicationStatus,
+  // Find applications with optional status filtering and pagination
+  async findPaginated(
     page: number,
     limit: number,
+    status?: HostApplicationStatus,
   ): Promise<{
     applications: HostApplication[];
     total: number;
@@ -149,21 +149,24 @@ export class MongoHostApplicationRepository
       !Number.isInteger(page) ||
       !Number.isInteger(limit) ||
       page < 1 ||
-      limit < 1
+      limit < 1 ||
+      limit > 100
     ) {
       throw new Error("Invalid pagination parameters");
     }
 
     const skip = (page - 1) * limit;
 
+    const filter = status ? { status } : {};
+
     const [documents, total] = await Promise.all([
-      HostApplicationModel.find({ status })
+      HostApplicationModel.find(filter)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .exec(),
 
-      HostApplicationModel.countDocuments({ status }).exec(),
+      HostApplicationModel.countDocuments(filter).exec(),
     ]);
 
     const applications = documents.map((document) =>

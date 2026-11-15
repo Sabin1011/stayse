@@ -20,6 +20,7 @@ export class JwtAccessTokenGenerator implements AccessTokenGenerator {
     return jwt.sign(
       {
         email: payload.email,
+        roles: payload.roles,
       },
       env.JWT_ACCESS_SECRET,
       options,

@@ -17,9 +17,10 @@ export class JwtAccessTokenVerifier implements AccessTokenVerifier {
 
     if (
       typeof decoded === "string" ||
-      !decoded.sub ||
       typeof decoded.sub !== "string" ||
-      typeof decoded.email !== "string"
+      typeof decoded.email !== "string" ||
+      !Array.isArray(decoded.roles) ||
+      !decoded.roles.every((role) => typeof role === "string")
     ) {
       throw new Error("Invalid access token payload");
     }
@@ -27,6 +28,7 @@ export class JwtAccessTokenVerifier implements AccessTokenVerifier {
     return {
       userId: decoded.sub,
       email: decoded.email,
+      roles: decoded.roles,
     };
   }
 }

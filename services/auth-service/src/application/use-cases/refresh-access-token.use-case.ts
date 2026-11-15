@@ -52,9 +52,12 @@ export class RefreshAccessToken {
       throw new AppError("User ID is missing", "INVALID_USER_ID");
     }
 
+    const roles = await this.userRepository.findRolesByUserId(user.id);
+
     const newAccessToken = this.accessTokenGenerator.generate({
       userId: user.id,
       email: user.email.getValue(),
+      roles,
     });
 
     const newRefreshToken = this.refreshTokenGenerator.generate();

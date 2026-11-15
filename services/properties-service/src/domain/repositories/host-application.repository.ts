@@ -1,4 +1,3 @@
-
 import { HostApplication } from "../entities/host-application.entity.js";
 import { HostApplicationStatus } from "../enums/host-application.enum.js";
 
@@ -15,10 +14,10 @@ export interface HostApplicationRepository {
 
   findByHostId(hostId: string): Promise<HostApplication[]>;
 
-  findByStatus(
-    status: HostApplicationStatus,
+  findPaginated(
     page: number,
     limit: number,
+    status?: HostApplicationStatus,
   ): Promise<{
     applications: HostApplication[];
     total: number;

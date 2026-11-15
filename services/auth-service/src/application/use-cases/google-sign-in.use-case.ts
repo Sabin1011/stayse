@@ -109,9 +109,12 @@ export class GoogleSignIn {
       throw new AppError("User ID is missing", "INVALID_USER_ID");
     }
 
+    const roles = await this.userRepository.findRolesByUserId(user.id);
+
     const accessToken = this.accessTokenGenerator.generate({
       userId: user.id,
       email: user.email.getValue(),
+      roles,
     });
 
     const refreshToken = this.refreshTokenGenerator.generate();

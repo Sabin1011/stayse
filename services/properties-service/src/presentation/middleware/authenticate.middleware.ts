@@ -41,8 +41,8 @@ export class AuthenticateMiddleware {
     const user = this.accessTokenVerifier.verify(token);
 
     (req as AuthenticatedRequest).auth = {
-    userId: user.userId,
-    roles: [],
+      userId: user.userId,
+      roles: user.roles,
     };
 
     next();

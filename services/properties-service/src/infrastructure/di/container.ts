@@ -25,6 +25,24 @@ import { MongoHostApplicationDocumentRepository } from "../repositories/mongo-ho
 
 import { UpdateAndResubmitHostApplicationUseCase } from "../../application/use-cases/update-and-resubmit-host-application.use-case.js";
 
+import { GetHostApplicationsUseCase } from "../../application/use-cases/admin/get-host-applications.use-case.js";
+
+import { AdminHostApplicationController } from "../../presentation/controllers/admin-host-application.controller.js";
+
+import { AuthorizeAdminMiddleware } from "../../presentation/middleware/authorize-admin.middleware.js";
+
+import { GetHostApplicationByIdUseCase } from "../../application/use-cases/admin/get-host-application-by-id.use-case.js";
+
+import { AdminHostApplicationDetailsController } from "../../presentation/controllers/admin-host-application-details.controller.js";
+
+import { ReviewHostApplicationUseCase } from "../../application/use-cases/admin/review-host-application.use-case.js";
+
+import { AdminHostApplicationReviewController } from "../../presentation/controllers/admin-host-application-review.controller.js";
+
+import { GetAdminHostApplicationDocumentUseCase } from "../../application/use-cases/admin/get-admin-host-application-document.use-case.js";
+
+import { AdminHostApplicationDocumentController } from "../../presentation/controllers/admin-host-application-document.controller.js";
+
 // --------------------------------------------------
 // Repositories
 // --------------------------------------------------
@@ -73,6 +91,27 @@ export const getHostApplicationDocumentUseCase =
   );
 
 // --------------------------------------------------
+// Admin use cases
+// --------------------------------------------------
+
+export const getHostApplicationsUseCase =
+  new GetHostApplicationsUseCase(hostApplicationRepository);
+
+export const getHostApplicationByIdUseCase =
+  new GetHostApplicationByIdUseCase(hostApplicationRepository);
+
+export const reviewHostApplicationUseCase =
+  new ReviewHostApplicationUseCase(
+    hostApplicationRepository,
+  );
+
+export const getAdminHostApplicationDocumentUseCase =
+  new GetAdminHostApplicationDocumentUseCase(
+    hostApplicationRepository,
+    hostApplicationDocumentRepository,
+  );
+
+// --------------------------------------------------
 // Controllers
 // --------------------------------------------------
 
@@ -93,6 +132,24 @@ export const hostApplicationDocumentController =
     getHostApplicationDocumentUseCase,
   );
 
+export const adminHostApplicationController =
+  new AdminHostApplicationController(getHostApplicationsUseCase);
+
+export const adminHostApplicationDetailsController =
+  new AdminHostApplicationDetailsController(
+    getHostApplicationByIdUseCase,
+  );
+
+export const adminHostApplicationReviewController =
+  new AdminHostApplicationReviewController(
+    reviewHostApplicationUseCase,
+  );
+
+export const adminHostApplicationDocumentController =
+  new AdminHostApplicationDocumentController(
+    getAdminHostApplicationDocumentUseCase,
+  );
+
 // --------------------------------------------------
 // Authentication
 // --------------------------------------------------
@@ -108,3 +165,11 @@ const accessTokenVerifier =
 
 export const authenticateMiddleware =
   new AuthenticateMiddleware(accessTokenVerifier);
+
+
+// --------------------------------------------------
+// Admin authorization
+// --------------------------------------------------
+
+export const authorizeAdminMiddleware =
+  new AuthorizeAdminMiddleware();
