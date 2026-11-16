@@ -1,7 +1,7 @@
 
 import { Types } from "mongoose";
 
-import type { HostApplicationRepository } from "../../domain/repositories/host-application.repository.js";
+import type { HostApplicationRepository } from "../../application/interfaces/host-application.repository.js";
 
 import { HostApplication } from "../../domain/entities/host-application.entity.js";
 

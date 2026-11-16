@@ -6,7 +6,7 @@ import type {
   SaveHostDocumentInput,
   StoredHostDocument,
   RetrievedHostDocument,
-} from "../../domain/repositories/host-application-document.repository.js";
+} from "../../application/interfaces/host-application-document.repository.js";
 
 import { HostApplicationDocumentModel } from "../database/mongodb/models/host-application-document.model.js";
 

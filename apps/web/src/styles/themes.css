@@ -1,28 +1,103 @@
+
 :root {
   color-scheme: light;
-  --background: #F8FAFC;
+
+  /* Core colors */
+  --background: #F6F8FC;
   --surface: #FFFFFF;
-  --surface-secondary: #EFF6FF;
-  --primary: #1D4ED8;
-  --primary-hover: #1E40AF;
+  --surface-secondary: #EFF4FB;
+
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
   --accent: #0F766E;
-  --text: #0F172A;
+
+  --text: #172033;
   --text-secondary: #64748B;
-  --border: #E2E8F0;
+
+  --border: #E7ECF3;
+
+  /* Feedback colors */
   --success: #15803D;
+  --success-bg: #F0FDF4;
+
+  --warning: #B45309;
+  --warning-bg: #FFFBEB;
+
   --error: #DC2626;
+  --error-bg: #FEF2F2;
+
+  --info: #2563EB;
+  --info-bg: #EFF6FF;
+
+  /* Soft, modern shadows */
+  --shadow-soft:
+    0 2px 8px rgba(15, 23, 42, 0.025),
+    0 8px 24px rgba(15, 23, 42, 0.035);
+
+  --shadow-raised:
+    0 8px 24px rgba(15, 23, 42, 0.06),
+    0 20px 48px rgba(15, 23, 42, 0.045);
+
+  --shadow-inset: inset 0 1px 2px rgba(15, 23, 42, 0.035);
+
+  --shadow-card:
+    0 2px 6px rgba(15, 23, 42, 0.025),
+    0 12px 32px rgba(15, 23, 42, 0.045);
+
+  /* Consistent radius scale */
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+
+  /* Layout */
+  --sidebar-width: 260px;
+  --header-height: 72px;
 }
+
 .dark {
   color-scheme: dark;
-  --background: #0B1220;
-  --surface: #111C2E;
-  --surface-secondary: #1D2D45;
-  --primary: #60A5FA;
-  --primary-hover: #93C5FD;
+
+  /* Core colors */
+  --background: #0D1422;
+  --surface: #151F30;
+  --surface-secondary: #1D2B40;
+
+  --primary: #6D9EFF;
+  --primary-hover: #8BB2FF;
   --accent: #5EEAD4;
-  --text: #F8FAFC;
-  --text-secondary: #CBD5E1;
-  --border: #334155;
+
+  --text: #F1F5F9;
+  --text-secondary: #A3B2C7;
+
+  --border: #29384D;
+
+  /* Feedback colors */
   --success: #4ADE80;
+  --success-bg: #142B25;
+
+  --warning: #FBBF24;
+  --warning-bg: #302719;
+
   --error: #F87171;
+  --error-bg: #321E27;
+
+  --info: #60A5FA;
+  --info-bg: #172B45;
+
+  /* Dark shadows */
+  --shadow-soft:
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.16);
+
+  --shadow-raised:
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    0 20px 48px rgba(0, 0, 0, 0.18);
+
+  --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+
+  --shadow-card:
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 12px 32px rgba(0, 0, 0, 0.16);
 }

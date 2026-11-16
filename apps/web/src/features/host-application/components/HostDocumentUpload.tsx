@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import type { ChangeEvent } from "react";
 import { CheckCircle2, FileUp, X } from "lucide-react";
@@ -8,10 +7,12 @@ import { uploadHostApplicationDocument } from "../../../services/api/hostApplica
 import type {
   HostDocumentType,
   HostDocumentReference,
+  MyHostApplicationDocument,
 } from "../types/hostApplication.types";
 
 interface Props {
   onDocumentsChange: (documents: HostDocumentReference[]) => void;
+  existingDocuments?: MyHostApplicationDocument[];
 }
 
 const documentOptions: {
@@ -56,6 +57,7 @@ const allowedTypes = [
 
 export default function HostDocumentUpload({
   onDocumentsChange,
+  existingDocuments = [],
 }: Props) {
   const [documents, setDocuments] = useState<
     HostDocumentReference[]
@@ -71,8 +73,6 @@ export default function HostDocumentUpload({
     documentType: HostDocumentType
   ) => {
     const file = event.target.files?.[0];
-
-    // Allow selecting the same file again later.
     event.target.value = "";
 
     if (!file) return;
@@ -86,11 +86,6 @@ export default function HostDocumentUpload({
 
     if (file.size > MAX_FILE_SIZE) {
       setError("Each document must be 5 MB or smaller.");
-      return;
-    }
-
-    if (uploadingType) {
-      setError("Please wait for the current upload to finish.");
       return;
     }
 
@@ -120,10 +115,11 @@ export default function HostDocumentUpload({
         return updated;
       });
     } catch (err: unknown) {
-      const message =
-        (err as {
+      const message = (
+        err as {
           response?: { data?: { message?: string } };
-        }).response?.data?.message;
+        }
+      ).response?.data?.message;
 
       setError(message ?? `Unable to upload ${file.name}. Please try again.`);
     } finally {
@@ -147,13 +143,17 @@ export default function HostDocumentUpload({
       </h2>
 
       <p className="mt-1 text-sm text-text-secondary">
-        Upload the documents needed to verify your host application.
-        PDF, JPG and PNG files are accepted, up to 5 MB each.
+        Upload PDF, JPG or PNG files, up to 5 MB each.
+        Existing documents are retained unless replaced.
       </p>
 
       <div className="mt-5 space-y-4">
         {documentOptions.map((option) => {
           const uploaded = documents.find(
+            (document) => document.documentType === option.type
+          );
+
+          const existing = existingDocuments.find(
             (document) => document.documentType === option.type
           );
 
@@ -173,6 +173,18 @@ export default function HostDocumentUpload({
                   <p className="mt-1 text-xs text-text-secondary">
                     {option.description}
                   </p>
+
+                  {uploaded && (
+                    <p className="mt-2 text-xs font-medium text-green-700">
+                      New document uploaded
+                    </p>
+                  )}
+
+                  {!uploaded && existing && (
+                    <p className="mt-2 text-xs font-medium text-green-700">
+                      Existing document retained
+                    </p>
+                  )}
                 </div>
 
                 {uploaded ? (
@@ -186,7 +198,7 @@ export default function HostDocumentUpload({
                       type="button"
                       onClick={() => removeDocument(option.type)}
                       className="rounded-lg p-2 text-text-secondary hover:bg-background hover:text-red-600"
-                      aria-label={`Remove ${option.label}`}
+                      aria-label={`Remove replacement ${option.label}`}
                     >
                       <X size={18} />
                     </button>
@@ -200,7 +212,11 @@ export default function HostDocumentUpload({
                     }`}
                   >
                     <FileUp size={17} />
-                    {isUploading ? "Uploading..." : "Choose file"}
+                    {isUploading
+                      ? "Uploading..."
+                      : existing
+                        ? "Replace file"
+                        : "Choose file"}
 
                     <input
                       type="file"
@@ -227,12 +243,6 @@ export default function HostDocumentUpload({
           {error}
         </div>
       )}
-
-      <p className="mt-3 text-xs text-text-secondary">
-        You can upload one document for each category. Uploaded documents
-        are linked to your authenticated account.
-      </p>
     </section>
   );
 }
-    

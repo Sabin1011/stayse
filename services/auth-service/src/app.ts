@@ -20,10 +20,12 @@ import {
   googleSignIn,
   updateUserProfile,
   uploadProfileImage,
+  assignUserRoleController,
 } from "./infrastructure/di/container.js";
 
 import { createAuthRoutes } from "./presentation/http/routes/auth.routes.js";
 import { errorHandler } from "./presentation/http/middlewares/error-handler.js";
+
 
 
 const app = express();
@@ -58,6 +60,7 @@ app.use(
     googleSignIn,
     updateUserProfile,
     uploadProfileImage,
+    assignUserRoleController,
   ),
 );
 

@@ -1,7 +1,7 @@
 
 import type {
   HostApplicationDocumentRepository,
-} from "../../domain/repositories/host-application-document.repository.js";
+} from "../interfaces/host-application-document.repository.js";
 
 export class GetHostApplicationDocumentUseCase {
   constructor(

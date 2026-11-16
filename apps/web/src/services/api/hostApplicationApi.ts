@@ -1,4 +1,3 @@
-
 import axiosInstance from "./axiosInstance";
 
 import type {
@@ -6,6 +5,7 @@ import type {
   SubmitHostApplicationRequest,
   SubmitHostApplicationResponse,
   GetMyHostApplicationResponse,
+  UpdateHostApplicationResponse,
   UploadHostApplicationDocumentResponse,
 } from "../../features/host-application/types/hostApplication.types";
 
@@ -23,7 +23,6 @@ export const uploadHostApplicationDocument = async (
       "/properties/host-applications/documents",
       formData,
       {
-        // Let the browser/Axios generate the multipart boundary.
         headers: {
           "Content-Type": undefined,
         },
@@ -45,11 +44,40 @@ export const submitHostApplication = async (
   return response.data;
 };
 
-export const getMyHostApplication = async () => {
+export const updateAndResubmitHostApplication = async (
+  data: SubmitHostApplicationRequest
+): Promise<UpdateHostApplicationResponse> => {
   const response =
-    await axiosInstance.get<GetMyHostApplicationResponse>(
-      "/properties/host-applications/me"
+    await axiosInstance.put<UpdateHostApplicationResponse>(
+      "/properties/host-applications/me",
+      data
     );
 
   return response.data;
 };
+
+export const getMyHostApplication =
+  async (): Promise<GetMyHostApplicationResponse> => {
+    try {
+      const response =
+        await axiosInstance.get<GetMyHostApplicationResponse>(
+          "/properties/host-applications/me"
+        );
+
+      return response.data;
+    } catch (error: unknown) {
+      const status = (
+        error as { response?: { status?: number } }
+      ).response?.status;
+
+      // No application is a valid state for a new applicant.
+      if (status === 404) {
+        return {
+          success: false,
+          data: null,
+        };
+      }
+
+      throw error;
+    }
+  };

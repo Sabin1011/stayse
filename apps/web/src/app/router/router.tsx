@@ -19,6 +19,14 @@ import ProfilePage from "../../features/profile/pages/ProfilePage";
 import EditProfilePage from "../../features/profile/pages/EditProfilePage";
 import HostApplicationPage from "../../features/host-application/pages/HostApplicationPage";
 
+import HostLayout from "../../features/host/layout/HostLayout";
+import HostDashboardPage from "../../features/host/pages/HostDashboardPage";
+
+import AdminHostApplicationsPage from "../../features/admin/pages/AdminHostApplicationsPage";
+
+import AdminLayout from "../../features/admin/layout/AdminLayout";
+
+import AdminHostApplicationDetailsPage from "../../features/admin/pages/AdminHostApplicationDetailsPage";
 
 export const router = createBrowserRouter([
   // Public routes
@@ -40,10 +48,6 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        path: "/host-application",
-        element: <HostApplicationPage />,
-      },
-      {
         path: "/account/profile",
         element: <ProfilePage />,
       },
@@ -55,15 +59,15 @@ export const router = createBrowserRouter([
         path: "/account/change-password",
         element: <ChangePasswordPage />,
       },
-      // Guest routes
+
+      // Guest experience: accessible to guests and approved hosts
       {
-        element: <RoleBasedRoute allowedRoles={["guest"]} />,
+        element: <RoleBasedRoute allowedRoles={["guest", "host"]} />,
         children: [
           {
             path: "/",
             element: <HomePage />,
           },
-
           {
             path: "/search",
             element: <SearchResultsPage />,
@@ -71,27 +75,63 @@ export const router = createBrowserRouter([
         ],
       },
 
+      // Guest host-application route
+      {
+        element: <RoleBasedRoute allowedRoles={["guest"]} />,
+        children: [
+          {
+            path: "/host-application",
+            element: <HostApplicationPage />,
+          },
+        ],
+      },
+
+
       // Host routes
       {
         element: <RoleBasedRoute allowedRoles={["host"]} />,
         children: [
           {
-            path: "/host/dashboard",
-            element: <div>Host Dashboard</div>,
+            element: <HostLayout />,
+            children: [
+              {
+                path: "/host/dashboard",
+                element: <HostDashboardPage />,
+              },
+              {
+                path: "/host/application",
+                element: <HostApplicationPage />,
+              },
+            ],
           },
         ],
       },
-
+      
       // Admin routes
       {
         element: <RoleBasedRoute allowedRoles={["admin"]} />,
         children: [
           {
-            path: "/admin/dashboard",
-            element: <div>Admin Dashboard</div>,
+            element: <AdminLayout />,
+            children: [
+              {
+                path: "/admin/dashboard",
+                element: <AdminHostApplicationsPage />,
+              },
+              {
+                path: "/admin/host-applications",
+                element: <AdminHostApplicationsPage />,
+              },
+              {
+                path: "/admin/host-applications/:applicationId",
+                element: <AdminHostApplicationDetailsPage />,
+              },
+            ],
           },
         ],
       },
+
+
     ],
   },
   {

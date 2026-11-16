@@ -42,6 +42,9 @@ import { UploadProfileImageController } from "../controllers/upload-profile-imag
 import { uploadImageMiddleware } from "../middlewares/upload-image.middleware.js";
 import type { UploadProfileImageUseCase } from "../../../application/use-cases/upload-profile-image.use-case.js";
 
+import type { AssignUserRoleController } from "../controllers/assign-user-role.controller.js";
+
+import { internalServiceAuth } from "../middlewares/internal-service-auth.middleware.js";
 
 export function createAuthRoutes(
   registerUser: RegisterUser,
@@ -61,6 +64,7 @@ export function createAuthRoutes(
   googleSignIn: GoogleSignIn,
   updateUserProfile: UpdateUserProfileUseCase,
   uploadProfileImage: UploadProfileImageUseCase,
+  assignUserRoleController: AssignUserRoleController,
 ): Router {
   const router = Router();
 
@@ -110,5 +114,10 @@ export function createAuthRoutes(
   router.post("/google", googleSignInController.handle);
   router.post("/profile/image",authenticateMiddleware.handle,uploadImageMiddleware.single("image"),uploadProfileImageController.handle,);
 
+  router.post(
+    "/internal/users/assign-role",
+    internalServiceAuth,
+    assignUserRoleController.handle,
+  );
   return router;
 }

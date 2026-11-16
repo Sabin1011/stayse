@@ -1,5 +1,6 @@
 
-import type { HostApplicationRepository } from "../../../domain/repositories/host-application.repository.js";
+import type { HostApplicationRepository } from "../../../application/interfaces/host-application.repository.js";
+import type { HostRoleAssigner } from "../../interfaces/host-role-assigner.interface.js";
 
 export type HostApplicationReviewAction =
   | "START_REVIEW"
@@ -17,6 +18,7 @@ interface ReviewHostApplicationInput {
 export class ReviewHostApplicationUseCase {
   constructor(
     private readonly hostApplicationRepository: HostApplicationRepository,
+    private readonly hostRoleAssigner: HostRoleAssigner,
   ) {}
 
   async execute(input: ReviewHostApplicationInput) {
@@ -27,6 +29,20 @@ export class ReviewHostApplicationUseCase {
 
     if (!application) {
       return null;
+    }
+
+    // An earlier approval may have succeeded in MongoDB
+    // while role assignment failed in Auth Service.
+    // Allow an admin to retry the role synchronization.
+    if (
+      input.action === "APPROVE" &&
+      application.props.status === "APPROVED"
+    ) {
+      await this.hostRoleAssigner.assignHostRole(
+        application.props.hostId,
+      );
+
+      return this.toResponse(application);
     }
 
     switch (input.action) {
@@ -59,7 +75,24 @@ export class ReviewHostApplicationUseCase {
     const updatedApplication =
       await this.hostApplicationRepository.update(application);
 
-    const props = updatedApplication.props;
+    // Assign the host role only after approval is persisted.
+    if (input.action === "APPROVE") {
+      await this.hostRoleAssigner.assignHostRole(
+        updatedApplication.props.hostId,
+      );
+    }
+
+    return this.toResponse(updatedApplication);
+  }
+
+  private toResponse(application: Awaited<
+    ReturnType<HostApplicationRepository["findById"]>
+  > & {}) {
+    if (!application) {
+      return null;
+    }
+
+    const props = application.props;
 
     return {
       id: props.id,

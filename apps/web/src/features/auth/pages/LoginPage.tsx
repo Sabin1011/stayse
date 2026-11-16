@@ -63,8 +63,16 @@ function LoginPage() {
 
     try {
       const currentUserResponse = await getCurrentUser();
-      dispatch(setUser(currentUserResponse.user));
-      navigate("/");
+      const currentUser = currentUserResponse.user;
+
+      dispatch(setUser(currentUser));
+
+      if (currentUser.roles.includes("admin")) {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
+      
     } catch (error) {
       dispatch(setAccessToken(""));
       throw error;

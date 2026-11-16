@@ -1,7 +1,7 @@
 
-import type { HostApplicationRepository } from "../../../domain/repositories/host-application.repository.js";
+import type { HostApplicationRepository } from "../../interfaces/host-application.repository.js";
 
-import type { HostApplicationDocumentRepository } from "../../../domain/repositories/host-application-document.repository.js";
+import type { HostApplicationDocumentRepository } from "../../interfaces/host-application-document.repository.js";
 
 export class GetAdminHostApplicationDocumentUseCase {
   constructor(

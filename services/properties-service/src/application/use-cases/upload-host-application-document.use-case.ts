@@ -2,7 +2,7 @@
 import type {
   HostApplicationDocumentRepository,
   StoredHostDocument,
-} from "../../domain/repositories/host-application-document.repository.js";
+} from "../interfaces/host-application-document.repository.js";
 
 import type { HostDocumentType } from "../../domain/enums/host-document-type.enum.js";
 

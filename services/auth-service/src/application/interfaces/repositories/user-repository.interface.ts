@@ -13,11 +13,11 @@ export interface UserRepository {
   findById(id: string): Promise<User | null>;
   findRolesByUserId(userId: string): Promise<string[]>;
 
+  assignRoleToUser(userId: string, roleName: string): Promise<void>;
+
   registerWithDefaultRole(data: CreateUserData): Promise<User>;
   update(user: User): Promise<User>;
-
   registerGoogleUser(data: CreateGoogleUserData): Promise<User>;
-  
   updateProfile(user: User): Promise<User>;
 }
 

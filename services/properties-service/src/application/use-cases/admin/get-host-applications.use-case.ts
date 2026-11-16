@@ -1,4 +1,4 @@
-import type { HostApplicationRepository } from "../../../domain/repositories/host-application.repository.js";
+import type { HostApplicationRepository } from "../../interfaces/host-application.repository.js";
 
 import { HostApplicationStatus } from "../../../domain/enums/host-application.enum.js";
 
