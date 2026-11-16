@@ -55,6 +55,9 @@ import { UpdateUserProfileUseCase } from "../../application/use-cases/update-use
 import { CloudinaryImageStorage } from "../cloudinary/cloudinary-image-storage.js";
 import { UploadProfileImageUseCase } from "../../application/use-cases/upload-profile-image.use-case.js";
 
+import { AssignUserRole } from "../../application/use-cases/assign-user-role.use-case.js";
+import { AssignUserRoleController } from "../../presentation/http/controllers/assign-user-role.controller.js";
+
 const userRepository = new PostgresUserRepository(postgresPool);
 
 const passwordResetGrantRepository =
@@ -227,3 +230,8 @@ export const uploadProfileImage = new UploadProfileImageUseCase(
   userRepository,
   imageStorage,
 );
+
+export const assignUserRole = new AssignUserRole(userRepository);
+
+export const assignUserRoleController =
+  new AssignUserRoleController(assignUserRole);

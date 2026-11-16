@@ -1,3 +1,4 @@
+
 import type { ReactNode } from "react";
 import Input from "./Input";
 
@@ -26,7 +27,7 @@ function FormField({
     <div className="flex flex-col gap-2">
       <label
         htmlFor={name}
-        className="text-sm font-medium text-text"
+        className="text-sm font-semibold tracking-[-0.01em] text-text"
       >
         {label}
         {required && <span className="ml-1 text-error">*</span>}
@@ -48,7 +49,7 @@ function FormField({
       {error && (
         <p
           id={`${name}-error`}
-          className="text-xs text-error"
+          className="text-xs font-medium text-error"
           role="alert"
         >
           {error}

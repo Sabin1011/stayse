@@ -1,14 +1,17 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Building2, UserRound, CheckCircle2 } from "lucide-react";
 
-import { submitHostApplication } from "../../../services/api/hostApplicationApi";
+import {
+  submitHostApplication,
+  updateAndResubmitHostApplication,
+} from "../../../services/api/hostApplicationApi";
 
 import type {
   VerificationType,
   SubmitHostApplicationRequest,
-  HostDocumentReference
+  HostDocumentReference,
+  MyHostApplication,
 } from "../types/hostApplication.types";
 
 import HostDocumentUpload from "./HostDocumentUpload";
@@ -39,7 +42,15 @@ const initialForm: FormState = {
   registrationNumber: "",
 };
 
-export default function HostApplicationForm() {
+interface HostApplicationFormProps {
+  initialApplication?: MyHostApplication;
+  onSuccess?: () => void;
+}
+
+export default function HostApplicationForm({
+  initialApplication,
+  onSuccess,
+}: HostApplicationFormProps ) {
   const [verificationType, setVerificationType] =
     useState<VerificationType>("INDIVIDUAL");
 
@@ -48,6 +59,30 @@ export default function HostApplicationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [documentReferences, setDocumentReferences] = useState<HostDocumentReference[]>([]);
+
+
+    useEffect(() => {
+    if (!initialApplication) return;
+
+    const applicant = initialApplication.applicantDetails;
+    const address = applicant.residentialAddress;
+
+    setVerificationType(initialApplication.verificationType);
+
+    setForm({
+      legalName: applicant.legalName,
+      contactPhone: applicant.contactPhone,
+      contactEmail: applicant.contactEmail,
+      addressLine: address.addressLine,
+      city: address.city,
+      state: address.state,
+      postalCode: address.postalCode,
+      countryCode: address.countryCode,
+      businessName: initialApplication.businessDetails?.businessName ?? "",
+      registrationNumber:
+        initialApplication.businessDetails?.registrationNumber ?? "",
+    });
+  }, [initialApplication]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -111,15 +146,27 @@ export default function HostApplicationForm() {
     try {
       setIsSubmitting(true);
 
-      const response = await submitHostApplication(requestData);
+      if (initialApplication) {
+        await updateAndResubmitHostApplication(requestData);
+        setSuccessMessage("Your application has been updated and resubmitted successfully.");
+      } else {
+        const response = await submitHostApplication(requestData);
 
-      setSuccessMessage(
-        `Your application was submitted successfully. Application ID: ${response.data.applicationId}`
-      );
-    } catch (err: any) {
+        setSuccessMessage(
+          `Your application was submitted successfully. Application ID: ${response.data.applicationId}`
+        );
+      }
+
+      onSuccess?.();
+    } catch (err: unknown) {
+      const message = (
+        err as {
+          response?: { data?: { message?: string } };
+        }
+      ).response?.data?.message;
+
       setError(
-        err.response?.data?.message ??
-          "Unable to submit your application. Please try again."
+        message ?? "Unable to submit your application. Please try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -363,6 +410,7 @@ export default function HostApplicationForm() {
       
       <HostDocumentUpload
         onDocumentsChange={setDocumentReferences}
+        existingDocuments={initialApplication?.documentReferences}
       />
 
       {error && (
@@ -389,7 +437,9 @@ export default function HostApplicationForm() {
         disabled={isSubmitting}
         className="w-full rounded-xl bg-primary px-6 py-4 text-sm font-bold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
       >
-        {isSubmitting ? "Submitting..." : "Submit Host Application"}
+        {isSubmitting ? "Submitting..." : initialApplication
+            ? "Update and Resubmit Application"
+            : "Submit Host Application"}
       </button>
 
     </form>

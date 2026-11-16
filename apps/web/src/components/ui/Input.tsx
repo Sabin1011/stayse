@@ -1,3 +1,4 @@
+
 import { forwardRef } from "react";
 import type { InputHTMLAttributes } from "react";
 
@@ -18,12 +19,18 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       <input
         ref={ref}
         className={`
-          w-full rounded-xl border bg-surface px-4 py-3
-          text-sm text-text placeholder:text-text-secondary
-          outline-none transition-colors duration-200
-          focus:border-primary focus:ring-2 focus:ring-primary/15
+          w-full rounded-xl border bg-surface
+          px-4 py-3.5 text-sm text-text
+          placeholder:text-text-secondary/70
+          outline-none
+          transition-all duration-200
+          focus:border-primary focus:ring-4 focus:ring-primary/10
           disabled:cursor-not-allowed disabled:opacity-50
-          ${hasError ? "border-error focus:border-error focus:ring-error/15" : "border-border"}
+          ${
+            hasError
+              ? "border-error focus:border-error focus:ring-error/10"
+              : "border-border hover:border-primary/40"
+          }
           ${className}
         `}
         {...props}

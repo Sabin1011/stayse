@@ -1,5 +1,5 @@
-import { HostApplication } from "../entities/host-application.entity.js";
-import { HostApplicationStatus } from "../enums/host-application.enum.js";
+import { HostApplication } from "../../domain/entities/host-application.entity.js";
+import { HostApplicationStatus } from "../../domain/enums/host-application.enum.js";
 
 export interface HostApplicationRepository {
   create(application: HostApplication): Promise<HostApplication>;

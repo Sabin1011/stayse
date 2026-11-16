@@ -1,6 +1,8 @@
+
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 @import "./styles/themes.css";
+@import "./styles/components.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -11,26 +13,67 @@
 
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
-
   --color-accent: var(--accent);
 
   --color-text: var(--text);
   --color-text-secondary: var(--text-secondary);
-
   --color-border: var(--border);
 
   --color-success: var(--success);
+  --color-warning: var(--warning);
   --color-error: var(--error);
+  --color-info: var(--info);
+
+  --shadow-soft: var(--shadow-soft);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-inset: var(--shadow-inset);
+  --shadow-card: var(--shadow-card);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   min-width: 320px;
+  min-height: 100vh;
+
   background: var(--background);
   color: var(--text);
+
   font-family: Inter, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+::selection {
+  background: var(--primary);
+  color: white;
 }

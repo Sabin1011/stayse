@@ -1,4 +1,4 @@
-import type { HostDocumentType } from "../enums/host-document-type.enum.js";
+import type { HostDocumentType } from "../../domain/enums/host-document-type.enum.js";
 
 
 export interface SaveHostDocumentInput {

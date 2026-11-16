@@ -109,6 +109,51 @@ export class PostgresUserRepository implements UserRepository {
     return result.rows.map((row) => row.role);
   }
 
+  async assignRoleToUser(
+    userId: string,
+    roleName: string,
+  ): Promise<void> {
+    const client = await this.pool.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      const userResult = await client.query(
+        `SELECT id FROM users WHERE id = $1`,
+        [userId],
+      );
+
+      if (userResult.rowCount !== 1) {
+        throw new Error("User not found");
+      }
+
+      const roleResult = await client.query(
+        `SELECT id FROM roles WHERE name = $1`,
+        [roleName],
+      );
+
+      const role = roleResult.rows[0];
+
+      if (!role) {
+        throw new Error(`Role '${roleName}' does not exist`);
+      }
+
+      await client.query(
+        `INSERT INTO user_roles (user_id, role_id)
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING`,
+        [userId, role.id],
+      );
+
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   async registerWithDefaultRole(data: CreateUserData): Promise<User> {
     const client = await this.pool.connect();
 

@@ -11,11 +11,11 @@ import {
 
 import type {
   HostApplicationRepository,
-} from "../../domain/repositories/host-application.repository.js";
+} from "../interfaces/host-application.repository.js";
 
 import type {
   HostApplicationDocumentRepository,
-} from "../../domain/repositories/host-application-document.repository.js";
+} from "../interfaces/host-application-document.repository.js";
 
 import type {
   SubmitHostApplicationDTO,
@@ -97,21 +97,34 @@ export class UpdateAndResubmitHostApplicationUseCase {
       }
     }
 
-    // 6. Update the existing domain entity.
+    // 6. Preserve existing documents unless a new document
+    // of the same type has been uploaded as a replacement.
+    const replacementTypes = new Set(
+      dto.documentReferences.map((document) => document.documentType)
+    );
+
+    const mergedDocumentReferences = [
+      ...application.props.documentReferences.filter(
+        (existingDocument) =>
+          !replacementTypes.has(existingDocument.documentType)
+      ),
+      ...dto.documentReferences,
+    ];
+
+    // 7. Update the existing domain entity.
     application.updateDetails({
       verificationType: dto.verificationType,
       applicantDetails: dto.applicantDetails,
       ...(dto.businessDetails
         ? { businessDetails: dto.businessDetails }
         : {}),
-      documentReferences: dto.documentReferences,
+      documentReferences: mergedDocumentReferences,
     });
 
-    // 7. Apply the domain submission rules.
-    // This records RESUBMITTED when the application already has history.
+    // 8. Apply the domain submission rules.
     application.submit(dto.hostId);
 
-    // 8. Update the existing MongoDB document, not create a new one.
+    // 9. Update the existing MongoDB document, not create a new one.
     return this.hostApplicationRepository.update(application);
   }
 }

@@ -43,6 +43,10 @@ import { GetAdminHostApplicationDocumentUseCase } from "../../application/use-ca
 
 import { AdminHostApplicationDocumentController } from "../../presentation/controllers/admin-host-application-document.controller.js";
 
+import { AuthServiceHostRoleAssigner } from "../clients/auth-service-host-role-assigner.js";
+
+
+
 // --------------------------------------------------
 // Repositories
 // --------------------------------------------------
@@ -100,10 +104,30 @@ export const getHostApplicationsUseCase =
 export const getHostApplicationByIdUseCase =
   new GetHostApplicationByIdUseCase(hostApplicationRepository);
 
+
+  
+const authServiceBaseUrl = process.env.AUTH_SERVICE_INTERNAL_URL;
+const internalServiceSecret = process.env.INTERNAL_SERVICE_SECRET;
+
+if (!authServiceBaseUrl) {
+  throw new Error("AUTH_SERVICE_INTERNAL_URL is not defined");
+}
+
+if (!internalServiceSecret) {
+  throw new Error("INTERNAL_SERVICE_SECRET is not defined");
+}
+
+const hostRoleAssigner = new AuthServiceHostRoleAssigner(
+  authServiceBaseUrl,
+  internalServiceSecret,
+);
+
+
 export const reviewHostApplicationUseCase =
   new ReviewHostApplicationUseCase(
     hostApplicationRepository,
-  );
+    hostRoleAssigner,
+  );  
 
 export const getAdminHostApplicationDocumentUseCase =
   new GetAdminHostApplicationDocumentUseCase(

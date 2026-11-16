@@ -7,11 +7,11 @@ import {
 
 import type {
   HostApplicationRepository,
-} from "../../domain/repositories/host-application.repository.js";
+} from "../interfaces/host-application.repository.js";
 
 import type {
   HostApplicationDocumentRepository,
-} from "../../domain/repositories/host-application-document.repository.js";
+} from "../interfaces/host-application-document.repository.js";
 
 import {
   ActiveHostApplicationExistsError,

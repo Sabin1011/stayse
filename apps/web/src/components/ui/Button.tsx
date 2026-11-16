@@ -1,3 +1,4 @@
+
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type ButtonVariant = "primary" | "secondary" | "outline";
@@ -11,24 +12,30 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
-const baseStyles =
-  "inline-flex items-center justify-center gap-2 rounded-xl font-semibold shadow-sm transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50";
+const baseStyles = [
+  "inline-flex items-center justify-center gap-2",
+  "rounded-xl font-semibold",
+  "transition-all duration-200 ease-out",
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+  "disabled:cursor-not-allowed disabled:opacity-50",
+  "active:scale-[0.98]",
+].join(" ");
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-white hover:bg-primary-hover",
+    "bg-primary text-white shadow-sm hover:bg-primary-hover hover:shadow-md",
 
   secondary:
-    "bg-surface-secondary text-text hover:opacity-80",
+    "border border-transparent bg-surface-secondary text-text hover:border-border hover:bg-surface-secondary/80",
 
   outline:
-    "border border-border bg-transparent text-text hover:bg-surface-secondary",
+    "border border-border bg-surface text-text shadow-sm hover:border-primary/40 hover:bg-surface-secondary",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: "px-3 py-2 text-sm",
-  md: "px-4 py-3 text-sm",
-  lg: "px-6 py-3 text-base",
+  sm: "rounded-lg px-3.5 py-2 text-sm",
+  md: "px-5 py-3 text-sm",
+  lg: "rounded-2xl px-6 py-3.5 text-base",
 };
 
 function Button({

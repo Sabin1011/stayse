@@ -153,6 +153,9 @@ importers:
 
   services/properties-service:
     dependencies:
+      cloudinary:
+        specifier: ^2.11.0
+        version: 2.11.0
       dotenv:
         specifier: ^18.0.9
         version: 18.0.9
